@@ -5,6 +5,12 @@
   flex-direction: column;
 }
 
+/* remove link style */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
 .app-main {
   flex: 1;
   display: grid;
