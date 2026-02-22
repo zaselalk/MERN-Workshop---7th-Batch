@@ -5,6 +5,8 @@ export const Student = () => {
   const [student, setStudent] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
+  const [submitting, setSubmitting] = React.useState(false);
+  const ref = React.useRef(null);
 
   const params = useParams();
 
@@ -28,6 +30,47 @@ export const Student = () => {
 
     fetchStudent();
   }, []);
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    // get form data
+    const title = event.target.title.value.trim();
+    const description = event.target.description.value.trim();
+    const status = event.target.status.value;
+
+    if (!title || !description || !status) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    setSubmitting(true);
+
+    const data = await fetch(`http://localhost:3000/tasks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title,
+        description,
+        status,
+        studentId: params.student_id,
+      }),
+    });
+
+    if (data.ok) {
+      const newTask = await data.json();
+      setStudent((prev) => ({
+        ...prev,
+        Tasks: [...(prev.Tasks || []), newTask],
+      }));
+      ref.current.reset();
+      setSubmitting(false);
+    } else {
+      alert("Failed to add task");
+      setError("Failed to add task");
+      setSubmitting(false);
+    }
+  }
 
   return (
     <div className="app-wrapper">
@@ -68,24 +111,61 @@ export const Student = () => {
             <section className="card">
               <div className="card-header">
                 <div>
-                  <h2 className="card-title">Student Profile</h2>
-                  <p className="card-desc">
-                    Personal details for this student.
-                  </p>
+                  <h2 className="card-title">{student?.name}</h2>
                 </div>
                 <Link to="/" className="badge" style={{ cursor: "pointer" }}>
                   &#8592; Back
                 </Link>
               </div>
-              <div className="student-item" style={{ background: "#f0f4ff" }}>
-                <div className="student-avatar">
-                  {student?.name?.charAt(0).toUpperCase()}
+
+              <form onSubmit={handleSubmit} ref={ref} className="student-form">
+                <div className="form-group">
+                  <label htmlFor="title" className="form-label">
+                    Task Title
+                  </label>
+                  <input
+                    type="text"
+                    id="title"
+                    name="name"
+                    className="form-input"
+                    placeholder="e.g. John Doe"
+                    required
+                  />
                 </div>
-                <div className="student-info">
-                  <span className="student-name">{student?.name}</span>
-                  <span className="student-meta">Age {student?.age}</span>
+                <div className="form-group">
+                  <label htmlFor="description" className="form-label">
+                    Task Description
+                  </label>
+                  <input
+                    type="text"
+                    id="description"
+                    name="description"
+                    className="form-input"
+                    placeholder="e.g. Complete math assignment"
+                    required
+                  />
                 </div>
-              </div>
+
+                <select
+                  name="status"
+                  id="status"
+                  className="form-input"
+                  required
+                >
+                  <option value="">Select Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={submitting}
+                >
+                  {submitting ? "Adding..." : "Add Student"}
+                </button>
+              </form>
             </section>
 
             <section className="card">
