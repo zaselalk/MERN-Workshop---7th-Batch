@@ -4,6 +4,7 @@ const sequalize = require('./db/dbConfig');
 
 require('./models');
 const studentRouter = require('./routes/student');
+const taskRouter = require('./routes/tasks');
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.get('/', (request, response) => {
 });
 
 app.use("/students", studentRouter)
+app.use("/tasks", taskRouter)
 
 app.listen(3000, () => {
     console.log('Server is running on port http://localhost:3000');
