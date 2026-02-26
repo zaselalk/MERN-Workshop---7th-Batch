@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
+import axiosClient from "../api/axiosClient";
 
 export const Home = () => {
   const [students, setStudents] = useState([]);
@@ -7,11 +8,16 @@ export const Home = () => {
   const [submitting, setSubmitting] = useState(false);
   const formRef = useRef(null);
 
-  async function getStudents() {
-    setLoading(true);
-    const res = await fetch("http://localhost:3000/students");
-    const data = await res.json();
-    setStudents(data);
+  async function getStudents(showLoading = true) {
+    if (showLoading) {
+      setLoading(true);
+    }
+    try {
+      const { data } = await axiosClient.get("/students");
+      setStudents(data);
+    } catch {
+      setStudents([]);
+    }
     setLoading(false);
   }
 
@@ -22,11 +28,7 @@ export const Home = () => {
     const name = event.target.name.value.trim();
     const age = event.target.age.value;
 
-    await fetch("http://localhost:3000/students", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, age }),
-    });
+    await axiosClient.post("/students", { name, age });
 
     formRef.current.reset();
     setSubmitting(false);
@@ -34,7 +36,18 @@ export const Home = () => {
   };
 
   useEffect(() => {
-    getStudents();
+    const loadStudents = async () => {
+      try {
+        const { data } = await axiosClient.get("/students");
+        setStudents(data);
+      } catch {
+        setStudents([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadStudents();
   }, []);
   return (
     <div className="app-wrapper">

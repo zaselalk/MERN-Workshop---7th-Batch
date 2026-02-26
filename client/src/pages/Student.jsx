@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Link, useParams } from "react-router";
+import axiosClient from "../api/axiosClient";
 
 export const Student = () => {
   const [student, setStudent] = React.useState(null);
@@ -13,13 +14,7 @@ export const Student = () => {
   useEffect(() => {
     const fetchStudent = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:3000/tasks/${params.student_id}`,
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch student data");
-        }
-        const data = await response.json();
+        const { data } = await axiosClient.get(`/tasks/${params.student_id}`);
         setStudent(data);
       } catch (err) {
         setError(err.message);
@@ -29,7 +24,7 @@ export const Student = () => {
     };
 
     fetchStudent();
-  }, []);
+  }, [params.student_id]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -46,26 +41,22 @@ export const Student = () => {
 
     setSubmitting(true);
 
-    const data = await fetch(`http://localhost:3000/tasks`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    try {
+      const response = await axiosClient.post(`/tasks`, {
         title,
         description,
         status,
         studentId: params.student_id,
-      }),
-    });
+      });
 
-    if (data.ok) {
-      const newTask = await data.json();
+      const newTask = response.data;
       setStudent((prev) => ({
         ...prev,
         Tasks: [...(prev.Tasks || []), newTask],
       }));
       ref.current.reset();
       setSubmitting(false);
-    } else {
+    } catch {
       alert("Failed to add task");
       setError("Failed to add task");
       setSubmitting(false);
