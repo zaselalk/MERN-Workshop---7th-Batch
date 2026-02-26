@@ -1,3 +1,10 @@
+// set the environment variables from .env file
+require('dotenv').config();
+
+// get the port from env
+const PORT = process.env.PORT || 3000;
+
+
 const express = require('express');
 const cors = require('cors');
 const sequalize = require('./db/dbConfig');
@@ -12,23 +19,19 @@ const app = express();
 app.use(cors());
 // add json body parser
 app.use(express.json());
+
+// sync the database models with the database - 
+// Use the migration in production
 sequalize.sync({
     alter: true
 });
 
 
-// Home  - /
-app.get('/', (request, response) => {
-    response.send({
-        message: 'Hello World!!'
-    })
-});
+app.use("/api/v1/students", studentRouter)
+app.use("/api/v1/tasks", taskRouter)
 
-app.use("/students", studentRouter)
-app.use("/tasks", taskRouter)
-
-app.listen(3000, () => {
-    console.log('Server is running on port http://localhost:3000');
+app.listen(PORT, () => {
+    console.log(`Server is running on port http://localhost:${PORT}`);
 })
 
 

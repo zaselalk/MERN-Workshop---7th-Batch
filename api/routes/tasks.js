@@ -1,27 +1,19 @@
 const express = require('express');
-const Student = require('../models/Student');
-const Task = require('../models/Task');
 const Router = express.Router();
+const taskController = require('../controllers/taskController');
 
-Router.get("/:id", async (request, response) => {
-    const { id } = request.params;
+/**
+ * @route GET /tasks/:id
+ * @desc Get tasks for a specific student by ID
+ * @access Public
+ */
+Router.get("/:id", taskController.getStudentTasks);
 
-    const student = await Student.findByPk(id, {
-        include: Task
-    })
-
-    response.send(student);
-})
-
-Router.post("/", async (request, response) => {
-    const { title, description, status, studentId } = request.body;
-    const task = await Task.create({
-        title,
-        description,
-        status,
-        studentId
-    })
-    response.send(task);
-})
+/**
+ * @route POST /tasks
+ * @desc Create a new task for a student
+ * @access Public
+ */
+Router.post("/", taskController.createTask);
 
 module.exports = Router;
