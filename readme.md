@@ -312,7 +312,6 @@ curl -X POST http://localhost:3000/api/v1/tasks \
 | **React** | A JavaScript library for building declarative, component-based user interfaces. |
 | **Vite** | A fast front-end build tool and development server for modern JavaScript projects. |
 | **React Router** | A library that enables client-side navigation in React applications without full page reloads. |
-| **Axios** | A promise-based HTTP client used in the front end to make requests to the REST API. |
 | **Ant Design (antd)** | A popular React UI component library providing pre-built, accessible components. |
 | **CORS** | **C**ross-**O**rigin **R**esource **S**haring — a browser security mechanism. The `cors` middleware is enabled on the Express server so the React dev server (port 5173) can call the API (port 3000). |
 | **dotenv** | A Node.js library that loads environment variables from a `.env` file into `process.env`, keeping secrets out of source code. |
